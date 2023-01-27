@@ -1,8 +1,8 @@
-const tableHead = document.querySelector('thead');
-const tableBody = document.querySelector('tbody');
+const tableHead = document.querySelector("thead");
+const tableBody = document.querySelector("tbody");
 
-const renderTable = () => {
-	tableHead.innerHTML = `
+const renderTable = (filterKey = null) => {
+  tableHead.innerHTML = `
 		<tr>
 			<th scope="col">No.</th>
 			<th scope="col">Tour ID</th>
@@ -16,9 +16,16 @@ const renderTable = () => {
 			<th scope="col">Ratings Quantity</th>
 		</tr>`;
 
-	let rowCount = 1;
-	for (const tour of tours) {
-		tableBody.innerHTML += `
+  if (!!filterKey) {
+    const [key, value] = filterKey;
+    tours = tours.filter((tour) => {
+      return tour[key] === value;
+    });
+  }
+
+  let rowCount = 1;
+  for (const tour of tours) {
+    tableBody.innerHTML += `
 			<tr>
 				<th scope="row">${rowCount}</th>
 				<td>${tour.id}</td>
@@ -32,8 +39,20 @@ const renderTable = () => {
 				<td>${tour.ratingsQuantity}</td>
 			</tr>`;
 
-		rowCount += 1;
-	}
+    rowCount += 1;
+  }
 };
 
-renderTable();
+const query = window.location.search;
+if (!query) {
+  renderTable();
+} else {
+  filterKey = query
+    .substring(1)
+    .split("&")
+    .find((item) => {
+      return Object.keys(tours[0]).includes(item.split("=")[0]);
+    })
+    .split("=");
+  renderTable(filterKey);
+}
